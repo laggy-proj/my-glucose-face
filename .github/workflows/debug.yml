@@ -10,7 +10,6 @@ jobs:
       - run: npm i -g @zeppos/zeus-cli
       - run: |
           R=$(npm root -g)/@zeppos/zeus-cli
-          ls $R/node_modules/@zeppos/zpm/lib | head -50
-          echo --- ; grep -rlE "RESIZE" $R/node_modules/@zeppos --include=*.js 2>/dev/null | head
-          echo --- ; grep -rhoE ".{200}default\.r.{200}" $R/node_modules/@zeppos --include=*.js 2>/dev/null | head -5
-          echo --- ; grep -rhoE ".{150}\bassets\b.{150}" $R/node_modules/@zeppos/zpm/lib 2>/dev/null | head -12
+          true
+          echo ---A; grep -rhoE '.{600}\[t\|\|r\|\|"","raw","default","fonts"\].{1800}' $R/node_modules/@zeppos --include=*.js | head -3
+          echo ---B; grep -rhoE '.{300}The icon fi.{200}' $R/node_modules/@zeppos --include=*.js | head -2
