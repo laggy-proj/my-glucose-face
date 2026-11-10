@@ -1,0 +1,15 @@
+name: Debug zeus
+on: workflow_dispatch
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm i -g @zeppos/zeus-cli
+      - run: |
+          R=$(npm root -g)/@zeppos/zeus-cli
+          find $R -ipath '*template*' -not -name '*.map' | grep -v '/node_modules/[^z]' | head -80
+          echo ---
+          grep -rn "default\.r\|\.r'" $R/node_modules/@zeppos/zpm/lib 2>/dev/null | cut -c1-220 | head -20
