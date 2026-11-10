@@ -10,6 +10,7 @@ jobs:
       - run: npm i -g @zeppos/zeus-cli
       - run: |
           R=$(npm root -g)/@zeppos/zeus-cli
-          find $R -ipath '*template*' -not -name '*.map' | grep -v '/node_modules/[^z]' | head -80
-          echo ---
-          grep -rn "default\.r\|\.r'" $R/node_modules/@zeppos/zpm/lib 2>/dev/null | cut -c1-220 | head -20
+          ls $R/node_modules/@zeppos/zpm/lib | head -50
+          echo --- ; grep -rlE "RESIZE" $R/node_modules/@zeppos --include=*.js 2>/dev/null | head
+          echo --- ; grep -rhoE ".{200}default\.r.{200}" $R/node_modules/@zeppos --include=*.js 2>/dev/null | head -5
+          echo --- ; grep -rhoE ".{150}\bassets\b.{150}" $R/node_modules/@zeppos/zpm/lib 2>/dev/null | head -12
