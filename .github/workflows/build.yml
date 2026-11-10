@@ -1,0 +1,54 @@
+name: Build watchface
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install zeus-cli
+        run: npm i -g @zeppos/zeus-cli
+      - name: Build .zab
+        run: zeus build
+      - name: Prepare site
+        run: |
+          mkdir -p _site
+          ls -la dist || true
+          cp dist/*.zab _site/face.zab
+          cat > _site/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Watchface QR</title>
+          <body style="font-family:system-ui;text-align:center;padding:24px">
+          <h1>Scan in Zepp (Developer Mode)</h1>
+          <p id="u"></p><img id="q" width="280" height="280" alt="QR">
+          <script>
+          var base = location.host + location.pathname.replace(/[^/]*$/, '');
+          var link = 'watchface://' + base + 'face.zab';
+          document.getElementById('u').textContent = link;
+          document.getElementById('q').src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=' + encodeURIComponent(link);
+          </script></body>
+          HTML
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4
