@@ -22,6 +22,13 @@ jobs:
         run: npm i -g @zeppos/zeus-cli
       - name: Build .zab
         run: zeus build
+      - name: Inspect package
+        run: |
+          set -x
+          unzip -l dist/*.zab
+          mkdir -p x && unzip -o -q dist/*.zab -d x && find x -type f | head -50
+          for f in $(find x -type f \( -name '*.zpk' -o -name '*.zip' \)); do echo "== $f"; unzip -l "$f" | head -30; done
+          file dist/*.zab
       - name: Prepare site
         run: |
           mkdir -p _site
