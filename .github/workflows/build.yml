@@ -22,18 +22,13 @@ jobs:
         run: npm i -g @zeppos/zeus-cli
       - name: Build .zab
         run: zeus build
-      - name: Inspect package
-        run: |
-          set -x
-          unzip -l dist/*.zab
-          mkdir -p x && unzip -o -q dist/*.zab -d x && find x -type f | head -50
-          for f in $(find x -type f \( -name '*.zpk' -o -name '*.zip' \)); do echo "== $f"; unzip -l "$f" | head -30; done
-          file dist/*.zab
       - name: Prepare site
         run: |
           mkdir -p _site
           ls -la dist || true
           cp dist/*.zab _site/face.zab
+          mkdir -p x && unzip -o -q dist/*.zab -d x
+          cp x/*.zpk _site/face.zpk
           cat > _site/index.html <<'HTML'
           <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
           <title>Watchface QR</title>
@@ -42,7 +37,7 @@ jobs:
           <p id="u"></p><img id="q" width="280" height="280" alt="QR">
           <script>
           var base = location.host + location.pathname.replace(/[^/]*$/, '');
-          var link = 'watchface://' + base + 'face.zab';
+          var link = 'watchface://' + base + 'face.zpk';
           document.getElementById('u').textContent = link;
           document.getElementById('q').src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=' + encodeURIComponent(link);
           </script></body>
