@@ -22,13 +22,6 @@ jobs:
         run: npm i -g @zeppos/zeus-cli
       - name: Build .zab
         run: zeus build
-      - name: Inspect package
-        run: |
-          mkdir -p x && unzip -o -q dist/*.zab -d x
-          mkdir -p y && unzip -o -q x/*.zpk -d y
-          for f in y/*.zip; do echo "== $f"; unzip -t "$f" | tail -3; unzip -lv "$f" | head -40; done
-          echo "== manifest"; cat x/manifest.json
-          ls -la dist; find dist -maxdepth 3 | head -40
       - name: Prepare site
         run: |
           mkdir -p _site
@@ -38,17 +31,20 @@ jobs:
           cp x/*.zpk _site/face.zpk
           mkdir -p _site/wf
           cp x/*.zpk _site/wf/a
+          mkdir -p y && unzip -o -q x/*.zpk -d y
+          cp y/device.zip _site/device.zip
+          cp y/device.zip _site/wf/d
           cp dist/*.zab _site/wf/b
           cat > _site/index.html <<'HTML'
           <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
           <title>Watchface QR</title>
           <body style="font-family:system-ui;text-align:center;padding:16px">
           <h1>Scan in Zepp (Developer Mode)</h1>
-          <p>Try A, then B, then C until one installs.</p>
+          <p>Try E, then F, then the others. A QR works only for a short time: scan it right after opening this page.</p>
           <div id="o"></div>
           <script>
           var base = location.host + location.pathname.replace(/[^/]*$/, '');
-          [['A: face.zpk','face.zpk'],['B: no extension, zpk','wf/a'],['C: no extension, zab','wf/b'],['D: face.zab','face.zab']].forEach(function (v) {
+          [['E: device.zip (try first)','device.zip'],['F: device.zip, no extension','wf/d'],['A: face.zpk','face.zpk'],['B: zpk, no extension','wf/a']].forEach(function (v) {
             var link = 'watchface://' + base + v[1];
             document.getElementById('o').insertAdjacentHTML('beforeend',
               '<h2>' + v[0] + '</h2><p style="word-break:break-all">' + link + '</p><img width="260" height="260" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(link) + '">');
